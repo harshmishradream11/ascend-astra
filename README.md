@@ -9,6 +9,7 @@ A Kong Gateway setup with custom plugins for API management and traffic control.
 | [maintenance](plugins/maintenance/) | Block traffic with maintenance responses | 11000 |
 | [conditional-req-termination](plugins/conditional-req-termination/) | Terminate requests based on query conditions | 8001 |
 | [strip-headers](plugins/strip-headers/) | Remove headers by prefix | 8000 |
+| [cors](plugins/cors/) | Handle Cross-Origin Resource Sharing (CORS) | 2000 |
 | [swap-header](plugins/swap-header/) | Rename/swap request headers | 1000 |
 | [rate-limiting-v2](plugins/rate-limiting-v2/) | Advanced rate limiting with Redis | 960 |
 
@@ -40,8 +41,8 @@ docker compose down -v
 | Kong Proxy     | http://localhost:8000 | Main API gateway    |
 | Kong Admin API | http://localhost:8001 | Kong administration |
 | Kong Manager   | http://localhost:8002 | Kong GUI dashboard  |
-| PostgreSQL     | localhost:5432        | Database            |
-| Redis          | localhost:6379        | Rate limiting cache |
+| PostgreSQL     | localhost:8032        | Database            |
+| Redis          | localhost:8079        | Rate limiting cache |
 
 ## Project Structure
 
@@ -51,6 +52,7 @@ ascend-kong/
 ├── docker-compose.yml
 ├── plugins/
 │   ├── conditional-req-termination/
+│   ├── cors/
 │   ├── maintenance/
 │   ├── rate-limiting-v2/
 │   ├── strip-headers/
