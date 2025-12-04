@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# Ascend Kong Docker Startup Script
+# Ascend Astra Docker Startup Script
 # ============================================
 
 set -e
@@ -12,7 +12,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_ROOT"
 
 echo "============================================"
-echo "  Ascend Kong - Docker Startup"
+echo "  Ascend Astra - Docker Startup"
 echo "============================================"
 
 # Check if Docker is running
@@ -53,7 +53,7 @@ fi
 # Display status
 echo ""
 echo "============================================"
-echo "  Ascend Kong is running!"
+echo "  Ascend Astra is running!"
 echo "============================================"
 echo ""
 echo "Services:"

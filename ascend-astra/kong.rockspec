@@ -1,15 +1,15 @@
-package = "ascend-kong"
+package = "ascend-astra"
 
 version = "1.0.0-1"
 
 supported_platforms = {"linux", "macosx"}
 source = {
-    url = "https://github.com/dream11/ascend-kong"
+    url = "https://github.com/dream11/ascend-astra"
 }
 
 description = {
     summary = "Kong with all its custom plugins",
-    homepage = "https://github.com/dream11/ascend-kong"
+    homepage = "https://github.com/dream11/ascend-astra"
 }
 
 dependencies = {

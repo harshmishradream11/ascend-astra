@@ -6,7 +6,7 @@ labels:
   - linux
   - X64
   - k8s
-  - ascend-kong
+  - ascend-astra
 
 resources:
   limits:

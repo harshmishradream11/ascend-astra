@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy rockspec and install dependencies
-COPY ascend-kong/kong.rockspec /tmp/kong.rockspec
+COPY ascend-astra/kong.rockspec /tmp/kong.rockspec
 WORKDIR /tmp
 
 # Install open source dependencies from rockspec

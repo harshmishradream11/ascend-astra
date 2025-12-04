@@ -41,7 +41,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ascend-kong-migrations
+    container_name: ascend-astra-migrations
     command: kong migrations bootstrap
     environment:
       KONG_DATABASE: postgres
@@ -61,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ascend-kong
+    container_name: ascend-astra
     environment:
       # Database
       KONG_DATABASE: postgres
