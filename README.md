@@ -1,4 +1,4 @@
-# Ascend Kong
+# Ascend Astra
 
 A Kong Gateway setup with custom plugins for API management and traffic control.
 
@@ -47,7 +47,7 @@ docker compose down -v
 ## Project Structure
 
 ```
-ascend-kong/
+ascend-astra/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── plugins/
@@ -57,7 +57,7 @@ ascend-kong/
 │   ├── rate-limiting-v2/
 │   ├── strip-headers/
 │   └── swap-header/
-├── ascend-kong/
+├── ascend-astra/
 │   ├── kong.rockspec
 │   └── kong.yml
 └── scripts/
