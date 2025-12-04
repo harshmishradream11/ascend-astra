@@ -1,7 +1,5 @@
 FROM dreamsports.jfrog.io/d11-docker-artifacts/actions-runner-maven:ubuntu-20.04
 
-LABEL maintainer="hulk_dev@dream11.com"
-
 USER root
 
 RUN set -ex \

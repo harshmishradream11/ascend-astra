@@ -19,7 +19,7 @@ Enable maintenance mode to block all traffic with a customizable response. Speci
   "error": {
     "MsgCode": "MG1008",
     "MsgShowUp": "Popup",
-    "MsgText": "Hulk is temporarily unavailable due to scheduled system maintenance. We'll be up & running shortly",
+    "MsgText": "Ascend is temporarily unavailable due to scheduled system maintenance. We'll be up & running shortly",
     "MsgTitle": "We are Under Maintenance",
     "MsgType": "Error"
   }

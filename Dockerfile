@@ -24,7 +24,6 @@ COPY plugins/maintenance /usr/local/share/lua/5.1/kong/plugins/maintenance
 COPY plugins/conditional-req-termination /usr/local/share/lua/5.1/kong/plugins/conditional-req-termination
 COPY plugins/strip-headers /usr/local/share/lua/5.1/kong/plugins/strip-headers
 COPY plugins/rate-limiting-v2 /usr/local/share/lua/5.1/kong/plugins/rate-limiting-v2
-COPY plugins/api-key-injector /usr/local/share/lua/5.1/kong/plugins/api-key-injector
 COPY plugins/swap-header /usr/local/share/lua/5.1/kong/plugins/swap-header
 COPY plugins/cors /usr/local/share/lua/5.1/kong/plugins/cors
 

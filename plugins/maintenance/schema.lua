@@ -9,7 +9,7 @@ local default_body = {
     error = {
         MsgCode = "MG1008",
         MsgShowUp = "Popup",
-        MsgText = "Hulk is temporarily unavailable due to scheduled system maintenance. We’ll be up & running shortly",
+        MsgText = "Ascend is temporarily unavailable due to scheduled system maintenance. We’ll be up & running shortly",
         MsgTitle = "We are Under Maintenance",
         MsgType = "Error",
     },
