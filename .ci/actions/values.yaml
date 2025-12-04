@@ -6,7 +6,7 @@ labels:
   - linux
   - X64
   - k8s
-  - bifrost
+  - ascend-kong
 
 resources:
   limits:

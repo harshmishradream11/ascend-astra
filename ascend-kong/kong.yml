@@ -1,21 +1,21 @@
 _format_version: "1.1"
 services:
   - connect_timeout: 10000
-    host: hulk-contest${TEAM_SUFFIX}.${PRIVATE_HOSTED_ZONE}
-    name: hulk-contest
-    port: 80
+    host: localhost
+    name: testlab
+    port: 8100
     protocol: http
     read_timeout: 10000
     retries: 1
     write_timeout: 10000
     tags:
-      - hulk-contest
+      - testlab
     routes:
-      - name: contest-details
+      - name: allocations
         methods:
           - GET
         paths:
-          - /v1/contest
+          - /v1/allocations
         path_handling: v1
         preserve_host: false
         protocols:
@@ -24,13 +24,13 @@ services:
         regex_priority: 0
         strip_path: false
         tags:
-          - hulk-contest
+          - testlab
         https_redirect_status_code: 426
-      - name: contest-join
+      - name: re-allocate
         methods:
-          - POST
+          - PUT
         paths:
-          - /v1/contest-join
+          - /v1/allocations
         path_handling: v1
         preserve_host: false
         protocols:
@@ -39,136 +39,21 @@ services:
         regex_priority: 0
         strip_path: false
         tags:
-          - hulk-contest
+          - testlab
         https_redirect_status_code: 426
-        plugins:
-          - name: circuit-breaker
-            config:
-              api_call_timeout_ms: 10000
-              error_msg_override: null
-              error_status_code: 599
-              excluded_apis: '{}'
-              failure_percent_threshold: 51
-              half_open_max_calls_in_window: 8
-              half_open_min_calls_in_window: 3
-              min_calls_in_window: 10
-              response_header_override: null
-              set_logger_metrics_in_ctx: true
-              wait_duration_in_half_open_state: 120
-              wait_duration_in_open_state: 15
-              window_time: 10
-            enabled: true
-            protocols:
-              - grpc
-              - grpcs
-              - http
-              - https
-      - name: contest-listing
-        methods:
-          - POST
-        paths:
-          - /v1/contest-list
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: contest-my-transaction-list
-        methods:
-          - GET
-        paths:
-          - /v1/mytransactions/transactions
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: contest-my-transaction
-        methods:
-          - GET
-        paths:
-          - /v1/mytransactions/transaction/
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: mega-contests
-        methods:
-          - POST
-        paths:
-          - /v1/contest/mega
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: my-contests
-        methods:
-          - GET
-        paths:
-          - /v1/contest/my-contest
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: pre-rl-leaderboard
-        methods:
-          - GET
-        paths:
-          - /v1/contest/leaderboard
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
-      - name: switch-team
-        methods:
-          - POST
-        paths:
-          - /v1/switch-teams
-        path_handling: v1
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        strip_path: false
-        tags:
-          - hulk-contest
-        https_redirect_status_code: 426
+
 plugins:
+  - name: swap-header
+    service: testlab
+    config:
+      source_header: x-api-key
+      target_header: x-project-key
+    enabled: true
+    protocols:
+      - http
+      - https
+    tags:
+      - testlab
   - name: circuit-breaker
     config:
       api_call_timeout_ms: 1000
@@ -190,22 +75,3 @@ plugins:
       - grpcs
       - http
       - https
-  - name: tenant-manager
-    enabled: true
-    config:
-      api_path_prefix: "/v1"
-      api_key_prefix: "bfr_live_"
-      api_key_length: 32
-      default_page_size: 20
-      max_page_size: 100
-  # API Key Authentication Plugin
-  # Validates x-api-key and transforms to x-project-key for upstream
-  - name: api-key-auth
-    enabled: true
-    config:
-      input_header: "x-api-key"       # Header containing the API key
-      output_header: "x-project-key"  # Header to send to upstream with project_key
-      hide_api_key: true              # Remove x-api-key before forwarding
-      add_tenant_header: false        # Optionally add x-tenant-id, x-tenant-name
-      add_project_id_header: false    # Optionally add x-project-id
-      anonymous_on_missing: false     # Require API key (set true for optional auth)

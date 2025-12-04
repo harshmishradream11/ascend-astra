@@ -25,15 +25,7 @@ COPY plugins/conditional-req-termination /usr/local/share/lua/5.1/kong/plugins/c
 COPY plugins/strip-headers /usr/local/share/lua/5.1/kong/plugins/strip-headers
 COPY plugins/rate-limiting-v2 /usr/local/share/lua/5.1/kong/plugins/rate-limiting-v2
 COPY plugins/api-key-injector /usr/local/share/lua/5.1/kong/plugins/api-key-injector
-COPY plugins/api-key-auth /usr/local/share/lua/5.1/kong/plugins/api-key-auth
-COPY plugins/tenant-manager /usr/local/share/lua/5.1/kong/plugins/tenant-manager
-
-# Copy initialization scripts
-COPY docker/init-db.sql /docker-entrypoint-initdb.d/
-COPY docker/seed-tenant.sh /usr/local/bin/seed-tenant.sh
-COPY docker/entrypoint.sh /usr/local/bin/custom-entrypoint.sh
-
-RUN chmod +x /usr/local/bin/seed-tenant.sh /usr/local/bin/custom-entrypoint.sh
+COPY plugins/swap-header /usr/local/share/lua/5.1/kong/plugins/swap-header
 
 # Switch back to kong user
 USER kong

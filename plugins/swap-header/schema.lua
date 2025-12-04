@@ -1,7 +1,7 @@
 local typedefs = require "kong.db.schema.typedefs"
 
 return {
-    name = "api-key-to-project-key",
+    name = "swap-header",
     fields = {
         {
             protocols = typedefs.protocols_http,

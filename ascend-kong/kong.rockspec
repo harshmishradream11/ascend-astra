@@ -36,6 +36,10 @@ build = {
         ["kong.plugins.strip-headers.handler"] = "plugins/strip-headers/handler.lua",
         ["kong.plugins.strip-headers.schema"] = "plugins/strip-headers/schema.lua",
 
+        -- swap-header plugin
+        ["kong.plugins.swap-header.handler"] = "plugins/swap-header/handler.lua",
+        ["kong.plugins.swap-header.schema"] = "plugins/swap-header/schema.lua",
+
         -- rate-limiting-v2 plugin
         ["kong.plugins.rate-limiting-v2.handler"] = "plugins/rate-limiting-v2/handler.lua",
         ["kong.plugins.rate-limiting-v2.schema"] = "plugins/rate-limiting-v2/schema.lua",
@@ -44,23 +48,5 @@ build = {
         ["kong.plugins.rate-limiting-v2.algorithms"] = "plugins/rate-limiting-v2/algorithms.lua",
         ["kong.plugins.rate-limiting-v2.connections"] = "plugins/rate-limiting-v2/connections.lua",
         ["kong.plugins.rate-limiting-v2.utils"] = "plugins/rate-limiting-v2/utils.lua",
-
-        -- api-key-injector plugin
-        ["kong.plugins.api-key-injector.handler"] = "plugins/api-key-injector/handler.lua",
-        ["kong.plugins.api-key-injector.schema"] = "plugins/api-key-injector/schema.lua",
-
-        -- api-key-auth plugin (validates API key and transforms to project key)
-        ["kong.plugins.api-key-auth.handler"] = "plugins/api-key-auth/handler.lua",
-        ["kong.plugins.api-key-auth.schema"] = "plugins/api-key-auth/schema.lua",
-
-        -- tenant-manager plugin
-        ["kong.plugins.tenant-manager.handler"] = "plugins/tenant-manager/handler.lua",
-        ["kong.plugins.tenant-manager.schema"] = "plugins/tenant-manager/schema.lua",
-        ["kong.plugins.tenant-manager.tenants"] = "plugins/tenant-manager/tenants.lua",
-        ["kong.plugins.tenant-manager.projects"] = "plugins/tenant-manager/projects.lua",
-        ["kong.plugins.tenant-manager.api_keys"] = "plugins/tenant-manager/api_keys.lua",
-        ["kong.plugins.tenant-manager.utils"] = "plugins/tenant-manager/utils.lua",
-        ["kong.plugins.tenant-manager.migrations"] = "plugins/tenant-manager/migrations/init.lua",
-        ["kong.plugins.tenant-manager.migrations.000_base_tenant_manager"] = "plugins/tenant-manager/migrations/000_base_tenant_manager.lua",
     },
 }

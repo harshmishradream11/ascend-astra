@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# Bifrost Kong Docker Startup Script
+# Ascend Kong Docker Startup Script
 # ============================================
 
 set -e
@@ -12,7 +12,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_ROOT"
 
 echo "============================================"
-echo "  Bifrost Kong - Docker Startup"
+echo "  Ascend Kong - Docker Startup"
 echo "============================================"
 
 # Check if Docker is running
@@ -53,7 +53,7 @@ fi
 # Display status
 echo ""
 echo "============================================"
-echo "  Bifrost Kong is running!"
+echo "  Ascend Kong is running!"
 echo "============================================"
 echo ""
 echo "Services:"
@@ -63,13 +63,6 @@ echo "  - Kong Manager:   http://localhost:8002"
 echo "  - PostgreSQL:     localhost:5432"
 echo "  - Redis:          localhost:6379"
 echo ""
-echo "Tenant Manager API Endpoints:"
-echo "  - POST   /v1/tenants                              - Create tenant"
-echo "  - GET    /v1/tenants                              - List tenants"
-echo "  - GET    /v1/tenants/{tenant_id}                  - Get tenant"
-echo "  - POST   /v1/tenants/{id}/projects                - Create project"
-echo "  - GET    /v1/tenants/{id}/projects                - List projects"
-echo "  - POST   /v1/tenants/{id}/projects/{id}/api-keys  - Generate API key"
 echo ""
 echo "View logs:  docker compose logs -f kong"
 echo "Stop:       docker compose down"

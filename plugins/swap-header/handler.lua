@@ -1,14 +1,14 @@
 local kong = kong
 
-local ApiKeyToProjectKey = {
+local SwapHeader = {
     PRIORITY = 1000,
     VERSION = "1.0.0",
 }
 
 local MISSING_API_KEY_ERROR_MESSAGE = "Missing API key in request header"
-local MISSING_API_KEY_ERROR_CODE = "AKPK-1001"
+local MISSING_API_KEY_ERROR_CODE = "SH-1001"
 
-function ApiKeyToProjectKey:access(conf)
+function SwapHeader:access(conf)
     -- Get header names from config or use defaults
     local source_header = conf.source_header or "x-api-key"
     local target_header = conf.target_header or "x-project-key"
@@ -36,5 +36,5 @@ function ApiKeyToProjectKey:access(conf)
     kong.log.debug("Replaced '" .. source_header .. "' with '" .. target_header .. "'")
 end
 
-return ApiKeyToProjectKey
+return SwapHeader
 
