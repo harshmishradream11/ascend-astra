@@ -79,7 +79,7 @@ services:
       KONG_ADMIN_GUI_URL: http://localhost:8002
       
       # Custom plugins
-      KONG_PLUGINS: bundled,maintenance,conditional-req-termination,strip-headers,rate-limiting-v2,swap-header,circuit-breaker,host-interpolate-by-header,kong-advanced-router
+      KONG_PLUGINS: bundled,maintenance,conditional-req-termination,strip-headers,rate-limiting-v2,swap-header,circuit-breaker,host-interpolate-by-header,kong-advanced-router,cors
       
       # Redis for rate limiting
       KONG_REDIS_HOST: redis
