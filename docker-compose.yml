@@ -1,7 +1,7 @@
 services:
-  # PostgreSQL Database
+  # PostgresSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: ascend-postgres
     environment:
       POSTGRES_USER: kong
@@ -40,13 +40,16 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: ascend-astra-migrations
-    command: kong migrations bootstrap
+    entrypoint: ["sh", "-c"]
+    command: ["kong migrations bootstrap && kong migrations up && kong migrations finish"]
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: postgres
+      KONG_PG_PORT: 5432
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kongpass
       KONG_PG_DATABASE: kong
+      KONG_PLUGINS: bundled,maintenance,conditional-req-termination,strip-headers,rate-limiting-v2,api-key-auth,tenant-manager
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,11 +75,12 @@ services:
         condition: service_healthy
       kong-migrations:
         condition: service_completed_successfully
-    restart: always
+
     environment:
       # Database
       KONG_DATABASE: postgres
       KONG_PG_HOST: postgres
+      KONG_PG_PORT: 5432
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kongpass
       KONG_PG_DATABASE: kong
@@ -90,12 +94,27 @@ services:
       KONG_ADMIN_GUI_URL: http://localhost:8002
       
       # Custom plugins
-      KONG_PLUGINS: bundled,maintenance,conditional-req-termination,strip-headers,rate-limiting-v2,swap-header,circuit-breaker,host-interpolate-by-header,kong-advanced-router,cors
-      
+      KONG_PLUGINS: bundled,maintenance,conditional-req-termination,strip-headers,rate-limiting-v2,api-key-auth,tenant-manager
+
       # Redis for rate limiting
       KONG_REDIS_HOST: redis
-      KONG_REDIS_PORT: 8079
+      KONG_REDIS_PORT: 6379
 
+      # Seed tenant configuration
+      SEED_DEFAULT_TENANT: "true"
+      DEFAULT_TENANT_NAME: "default"
+      DEFAULT_TENANT_EMAIL: "admin@ascend.local"
+      DEFAULT_PROJECT_NAME: "My First Project"
+      DEFAULT_PROJECT_KEY: "my-first-project"
+
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - ascend-network
+    restart: unless-stopped
 
 networks:
   ascend-network:

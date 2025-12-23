@@ -16,8 +16,7 @@ dependencies = {
     -- Install open sourced plugins
     "kong-circuit-breaker == 2.1.1",
     "host-interpolate-by-header == 1.3.0",
-    "kong-advanced-router == 0.2.1",
-    "lua-resty-jwt == 0.2.2",
+    "kong-advanced-router == 0.2.1"
 }
 
 build = {
