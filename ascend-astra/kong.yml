@@ -1,5 +1,131 @@
 _format_version: "1.1"
 services:
+  # Tenant Manager Service (handled by tenant-manager plugin, no actual upstream needed)
+  - name: tenant-manager
+    host: localhost
+    port: 8001
+    protocol: http
+    connect_timeout: 10000
+    read_timeout: 10000
+    write_timeout: 10000
+    tags:
+      - tenant-manager
+    routes:
+      # Tenants collection
+      - name: tenant-manager-tenants
+        methods:
+          - GET
+          - POST
+        paths:
+          - /v1/tenants
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # Single tenant
+      - name: tenant-manager-tenant
+        methods:
+          - GET
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 50
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # Projects collection
+      - name: tenant-manager-projects
+        methods:
+          - GET
+          - POST
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)/projects$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # Single project
+      - name: tenant-manager-project
+        methods:
+          - GET
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)/projects/(?<project_id>[a-zA-Z0-9-]+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 150
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # API Keys collection
+      - name: tenant-manager-api-keys
+        methods:
+          - POST
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)/projects/(?<project_id>[a-zA-Z0-9-]+)/api-keys$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 200
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # Single API key
+      - name: tenant-manager-api-key
+        methods:
+          - GET
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)/projects/(?<project_id>[a-zA-Z0-9-]+)/api-keys/(?<key_id>[a-zA-Z0-9-]+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 250
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+      # Rotate API key
+      - name: tenant-manager-api-key-rotate
+        methods:
+          - POST
+        paths:
+          - ~/v1/tenants/(?<tenant_id>[a-zA-Z0-9-]+)/projects/(?<project_id>[a-zA-Z0-9-]+)/api-keys/(?<key_id>[a-zA-Z0-9-]+)/rotate$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 300
+        strip_path: false
+        tags:
+          - tenant-manager
+        https_redirect_status_code: 426
+
   - connect_timeout: 10000
     host: localhost
     name: testlab
