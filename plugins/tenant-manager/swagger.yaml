@@ -1,0 +1,950 @@
+openapi: 3.0.3
+info:
+  title: Tenant Manager API
+  description: |
+    Kong plugin for multi-tenant management with hierarchical organization structure.
+    
+    This API provides endpoints to manage:
+    - **Tenants**: Top-level organizational units
+    - **Projects**: Subdivisions within tenants
+    - **API Keys**: Authentication credentials for projects
+    
+    ## Hierarchy
+    ```
+    Tenant
+    └── Project
+        └── API Key
+    ```
+    
+    ## Error Codes
+    | Code | Description |
+    |------|-------------|
+    | TM-1001 | Validation Error |
+    | TM-1002 | Not Found |
+    | TM-1003 | Duplicate Resource |
+    | TM-1004 | Database Error |
+    | TM-1005 | Method Not Allowed |
+    | TM-1006 | Invalid Request Body |
+    | TM-1007 | Forbidden |
+    | TM-1008 | Unauthorized |
+  version: 1.0.0
+  contact:
+    name: Ascend Astra Team
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8000/v1
+    description: Local Development
+  - url: https://api.example.com/v1
+    description: Production
+
+tags:
+  - name: Tenants
+    description: Tenant management operations
+  - name: Projects
+    description: Project management operations
+  - name: API Keys
+    description: API key management operations
+
+paths:
+  /tenants:
+    post:
+      tags:
+        - Tenants
+      summary: Create a new tenant
+      description: Creates a new tenant organization in the system
+      operationId: createTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+            examples:
+              basic:
+                summary: Basic tenant creation
+                value:
+                  name: "Acme Corporation"
+                  contact_email: "admin@acme.com"
+              with_description:
+                summary: Tenant with description
+                value:
+                  name: "Acme Corporation"
+                  contact_email: "admin@acme.com"
+                  description: "Enterprise customer since 2024"
+      responses:
+        '201':
+          description: Tenant created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTenantResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_name:
+                  summary: Invalid name
+                  value:
+                    error:
+                      message: "Invalid name"
+                      code: "TM-1001"
+                      cause: "Name is required and must be at least 3 characters"
+                invalid_email:
+                  summary: Invalid email
+                  value:
+                    error:
+                      message: "Invalid contact_email"
+                      code: "TM-1001"
+                      cause: "A valid email address is required"
+        '409':
+          description: Tenant already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Tenant already exists"
+                  code: "TM-1003"
+                  cause: "A tenant with this name already exists"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags:
+        - Tenants
+      summary: List all tenants
+      description: Retrieves a paginated list of all tenants
+      operationId: listTenants
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: List of tenants retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTenantsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}:
+    get:
+      tags:
+        - Tenants
+      summary: Get tenant details
+      description: Retrieves detailed information about a specific tenant
+      operationId: getTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+      responses:
+        '200':
+          description: Tenant details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTenantResponse'
+        '400':
+          description: Invalid tenant ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Invalid tenant_id"
+                  code: "TM-1001"
+                  cause: "A valid tenant ID is required"
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Tenant not found"
+                  code: "TM-1002"
+                  cause: "No tenant found with the given ID"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}/projects:
+    post:
+      tags:
+        - Projects
+      summary: Create a new project
+      description: |
+        Creates a new project under a tenant. 
+        
+        When a project is created, an API key is automatically generated and returned in the response.
+        The project_key is automatically derived from the project name (lowercase, alphanumeric with hyphens).
+      operationId: createProject
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
+            example:
+              name: "My Awesome Project"
+      responses:
+        '201':
+          description: Project created successfully with auto-generated API key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProjectResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_tenant_id:
+                  summary: Invalid tenant ID
+                  value:
+                    error:
+                      message: "Invalid tenant_id"
+                      code: "TM-1001"
+                      cause: "A valid tenant ID is required"
+                invalid_name:
+                  summary: Invalid project name
+                  value:
+                    error:
+                      message: "Invalid name"
+                      code: "TM-1001"
+                      cause: "Project name is required"
+                invalid_project_name:
+                  summary: Invalid project name characters
+                  value:
+                    error:
+                      message: "Invalid project name"
+                      code: "TM-1001"
+                      cause: "Project name must contain valid characters (lowercase alphanumeric and hyphens)"
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Tenant not found"
+                  code: "TM-1002"
+                  cause: "No tenant found with the given ID"
+        '409':
+          description: Project already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Project already exists"
+                  code: "TM-1003"
+                  cause: "A project with this key already exists for this tenant"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags:
+        - Projects
+      summary: List projects for a tenant
+      description: Retrieves a paginated list of all projects belonging to a tenant, including their active API keys
+      operationId: listProjects
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: List of projects retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProjectsResponse'
+        '400':
+          description: Invalid tenant ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}/projects/{project_id}:
+    get:
+      tags:
+        - Projects
+      summary: Get project details
+      description: Retrieves detailed information about a specific project
+      operationId: getProject
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+        - $ref: '#/components/parameters/ProjectIdParam'
+      responses:
+        '200':
+          description: Project details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProjectResponse'
+        '400':
+          description: Invalid tenant ID or project ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Project not found"
+                  code: "TM-1002"
+                  cause: "No project found with the given ID for this tenant"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}/projects/{project_id}/api-keys:
+    post:
+      tags:
+        - API Keys
+      summary: Generate a new API key
+      description: |
+        Generates a new API key for a project.
+        
+        **Important**: The `api_key` value is only returned once in this response. 
+        Store it securely as it cannot be retrieved again.
+      operationId: generateApiKey
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+        - $ref: '#/components/parameters/ProjectIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateApiKeyRequest'
+            example:
+              name: "Production API Key"
+      responses:
+        '201':
+          description: API key generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateApiKeyResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "Project not found"
+                  code: "TM-1002"
+                  cause: "No project found with the given ID for this tenant"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}/projects/{project_id}/api-keys/{key_id}:
+    get:
+      tags:
+        - API Keys
+      summary: Get API key metadata
+      description: |
+        Retrieves metadata about an API key.
+        
+        **Note**: This endpoint does NOT return the actual API key value for security reasons.
+        Only metadata such as name, status, and timestamps are returned.
+      operationId: getApiKey
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: '#/components/parameters/KeyIdParam'
+      responses:
+        '200':
+          description: API key metadata retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetApiKeyResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: API key not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: "API key not found"
+                  code: "TM-1002"
+                  cause: "No API key found with the given ID for this project"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tenants/{tenant_id}/projects/{project_id}/api-keys/{key_id}/rotate:
+    post:
+      tags:
+        - API Keys
+      summary: Rotate an API key
+      description: |
+        Rotates an existing API key by generating a new key value.
+        
+        The old API key is immediately invalidated and the new key is returned.
+        
+        **Important**: 
+        - The new `api_key` value is only returned once in this response
+        - Revoked keys cannot be rotated
+        - Store the new key securely as it cannot be retrieved again
+      operationId: rotateApiKey
+      parameters:
+        - $ref: '#/components/parameters/TenantIdParam'
+        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: '#/components/parameters/KeyIdParam'
+      responses:
+        '200':
+          description: API key rotated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RotateApiKeyResponse'
+        '400':
+          description: Validation error or key is revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_key_id:
+                  summary: Invalid key ID
+                  value:
+                    error:
+                      message: "Invalid key_id"
+                      code: "TM-1001"
+                      cause: "A valid API key ID is required"
+                revoked_key:
+                  summary: Key is revoked
+                  value:
+                    error:
+                      message: "Cannot rotate revoked key"
+                      code: "TM-1001"
+                      cause: "This API key has been revoked and cannot be rotated"
+        '404':
+          description: API key not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    TenantIdParam:
+      name: tenant_id
+      in: path
+      required: true
+      description: Unique identifier of the tenant (UUID format)
+      schema:
+        type: string
+        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+    ProjectIdParam:
+      name: project_id
+      in: path
+      required: true
+      description: Unique identifier of the project (UUID format)
+      schema:
+        type: string
+        format: uuid
+        example: "660e8400-e29b-41d4-a716-446655440001"
+
+    KeyIdParam:
+      name: key_id
+      in: path
+      required: true
+      description: Unique identifier of the API key (UUID format)
+      schema:
+        type: string
+        format: uuid
+        example: "770e8400-e29b-41d4-a716-446655440002"
+
+    PageParam:
+      name: page
+      in: query
+      required: false
+      description: Page number for pagination (starts at 1)
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      required: false
+      description: Number of items per page (max 100)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+
+  schemas:
+    # Request Schemas
+    CreateTenantRequest:
+      type: object
+      required:
+        - name
+        - contact_email
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Name of the tenant (must be unique)
+          example: "Acme Corporation"
+        contact_email:
+          type: string
+          format: email
+          description: Primary contact email for the tenant
+          example: "admin@acme.com"
+        description:
+          type: string
+          maxLength: 1000
+          description: Optional description of the tenant
+          example: "Enterprise customer"
+
+    CreateProjectRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: |
+            Name of the project. A project_key will be automatically generated 
+            from this name (lowercase, alphanumeric with hyphens).
+          example: "My Awesome Project"
+
+    GenerateApiKeyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          description: Optional name for the API key. Defaults to project name if not provided.
+          example: "Production API Key"
+
+    # Response Schemas
+    CreateTenantResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tenant_id:
+              type: string
+              format: uuid
+              description: Unique identifier of the created tenant
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            name:
+              type: string
+              description: Name of the tenant
+              example: "Acme Corporation"
+            status:
+              $ref: '#/components/schemas/TenantStatus'
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp when the tenant was created
+              example: "2024-01-15 10:30:00"
+
+    ListTenantsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tenants:
+              type: array
+              items:
+                type: object
+                properties:
+                  tenant_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  name:
+                    type: string
+                    example: "Acme Corporation"
+                  contact_email:
+                    type: string
+                    format: email
+                    example: "admin@acme.com"
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    GetTenantResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tenant_id:
+              type: string
+              format: uuid
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            name:
+              type: string
+              example: "Acme Corporation"
+            description:
+              type: string
+              example: "Enterprise customer"
+            contact_email:
+              type: string
+              format: email
+              example: "admin@acme.com"
+            status:
+              $ref: '#/components/schemas/TenantStatus'
+            created_at:
+              type: string
+              format: date-time
+              example: "2024-01-15 10:30:00"
+            updated_at:
+              type: string
+              format: date-time
+              example: "2024-01-15 10:30:00"
+
+    CreateProjectResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tenant_id:
+              type: string
+              format: uuid
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            project_id:
+              type: string
+              format: uuid
+              example: "660e8400-e29b-41d4-a716-446655440001"
+            project_key:
+              type: string
+              pattern: "^[a-z0-9-]+$"
+              description: Auto-generated key derived from project name
+              example: "my-awesome-project"
+            name:
+              type: string
+              example: "My Awesome Project"
+            status:
+              $ref: '#/components/schemas/ProjectStatus'
+            api_key:
+              type: string
+              format: uuid
+              description: Auto-generated API key (only shown once, store securely)
+              example: "880e8400-e29b-41d4-a716-446655440003"
+            api_key_id:
+              type: string
+              format: uuid
+              description: ID of the auto-generated API key
+              example: "770e8400-e29b-41d4-a716-446655440002"
+            api_key_name:
+              type: string
+              description: Name of the auto-generated API key
+              example: "My Awesome Project"
+
+    ListProjectsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            projects:
+              type: array
+              items:
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                    format: uuid
+                    example: "660e8400-e29b-41d4-a716-446655440001"
+                  tenant_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  project_key:
+                    type: string
+                    example: "my-awesome-project"
+                  name:
+                    type: string
+                    example: "My Awesome Project"
+                  status:
+                    $ref: '#/components/schemas/ProjectStatus'
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15 10:30:00"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15 10:30:00"
+                  api_key:
+                    type: string
+                    format: uuid
+                    description: Active API key for the project
+                    example: "880e8400-e29b-41d4-a716-446655440003"
+                  api_key_id:
+                    type: string
+                    format: uuid
+                    example: "770e8400-e29b-41d4-a716-446655440002"
+                  api_key_name:
+                    type: string
+                    example: "My Awesome Project"
+                  api_key_status:
+                    $ref: '#/components/schemas/ApiKeyStatus'
+                  last_rotated_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    example: null
+                  last_used_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    example: null
+                  api_key_created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15 10:30:00"
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    GetProjectResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            project_id:
+              type: string
+              format: uuid
+              example: "660e8400-e29b-41d4-a716-446655440001"
+            tenant_id:
+              type: string
+              format: uuid
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            name:
+              type: string
+              example: "My Awesome Project"
+            created_at:
+              type: string
+              format: date-time
+              example: "2024-01-15 10:30:00"
+
+    GenerateApiKeyResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            key_id:
+              type: string
+              format: uuid
+              description: Unique identifier of the API key
+              example: "770e8400-e29b-41d4-a716-446655440002"
+            name:
+              type: string
+              description: Name of the API key
+              example: "Production API Key"
+            api_key:
+              type: string
+              format: uuid
+              description: |
+                The actual API key value. 
+                **Store this securely - it will not be shown again!**
+              example: "880e8400-e29b-41d4-a716-446655440003"
+            created_at:
+              type: string
+              format: date-time
+              example: "2024-01-15 10:30:00"
+
+    GetApiKeyResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            key_id:
+              type: string
+              format: uuid
+              example: "770e8400-e29b-41d4-a716-446655440002"
+            project_id:
+              type: string
+              format: uuid
+              example: "660e8400-e29b-41d4-a716-446655440001"
+            project_key:
+              type: string
+              description: The project key this API key belongs to
+              example: "my-awesome-project"
+            name:
+              type: string
+              example: "Production API Key"
+            status:
+              $ref: '#/components/schemas/ApiKeyStatus'
+            created_at:
+              type: string
+              format: date-time
+              example: "2024-01-15 10:30:00"
+            last_rotated_at:
+              type: string
+              format: date-time
+              nullable: true
+              description: Timestamp of last key rotation
+              example: null
+
+    RotateApiKeyResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            key_id:
+              type: string
+              format: uuid
+              example: "770e8400-e29b-41d4-a716-446655440002"
+            name:
+              type: string
+              example: "Production API Key"
+            api_key:
+              type: string
+              format: uuid
+              description: |
+                The new API key value. The old key is immediately invalidated.
+                **Store this securely - it will not be shown again!**
+              example: "990e8400-e29b-41d4-a716-446655440004"
+            rotated_at:
+              type: string
+              format: date-time
+              description: Timestamp when the key was rotated
+              example: "2024-01-16 14:00:00"
+
+    # Common Schemas
+    TenantStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - SUSPENDED
+      description: Status of the tenant
+      example: "ACTIVE"
+
+    ProjectStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - SUSPENDED
+      description: Status of the project
+      example: "ACTIVE"
+
+    ApiKeyStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - REVOKED
+      description: Status of the API key
+      example: "ACTIVE"
+
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          description: Current page number
+          example: 1
+        page_size:
+          type: integer
+          description: Number of items per page
+          example: 20
+        total_count:
+          type: integer
+          description: Total number of items
+          example: 45
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+            - message
+            - code
+          properties:
+            message:
+              type: string
+              description: Human-readable error message
+              example: "Validation error"
+            code:
+              type: string
+              description: Machine-readable error code
+              example: "TM-1001"
+            cause:
+              type: string
+              description: Detailed cause of the error
+              example: "A valid email address is required"
+
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              message: "Database error"
+              code: "TM-1004"
+              cause: "Connection to database failed"
+
