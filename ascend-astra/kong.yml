@@ -42,6 +42,361 @@ services:
           - testlab
         https_redirect_status_code: 426
 
+  # Flockr Admin API Service (port 8250)
+  - connect_timeout: 10000
+    host: localhost
+    name: flockr-admin
+    port: 8250
+    protocol: http
+    read_timeout: 60000
+    retries: 1
+    write_timeout: 60000
+    tags:
+      - flockr-admin
+    routes:
+      # Audiences
+      - name: flockr-admin-list-audiences
+        methods:
+          - GET
+        paths:
+          - /v1/audiences
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-create-audience
+        methods:
+          - POST
+        paths:
+          - /v1/audiences
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-get-audience-details
+        methods:
+          - GET
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-create-rules
+        methods:
+          - POST
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)/rules$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-get-rule-details
+        methods:
+          - GET
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)/rules/(?<ruleId>\d+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 200
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-get-audience-owners
+        methods:
+          - GET
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)/owners$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      - name: flockr-admin-update-audience-owner
+        methods:
+          - POST
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)/owners$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audiences
+        https_redirect_status_code: 426
+      # Audience Imports
+      - name: flockr-admin-create-import
+        methods:
+          - POST
+        paths:
+          - ~/v1/audiences/(?<audienceId>\d+)/imports$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - audience-imports
+        https_redirect_status_code: 426
+      # Data Connectors - Connector Types
+      - name: flockr-admin-list-connector-types
+        methods:
+          - GET
+        paths:
+          - /v1/connectors/types
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      - name: flockr-admin-get-connector-type
+        methods:
+          - GET
+        paths:
+          - ~/v1/connectors/types/(?<typeId>\d+)$
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      - name: flockr-admin-onboard-connector-type
+        methods:
+          - POST
+        paths:
+          - /v1/connectors/types/onboard
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      # Data Connectors - Data Sinks
+      - name: flockr-admin-list-data-sinks
+        methods:
+          - GET
+        paths:
+          - /v1/datasinks
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      - name: flockr-admin-onboard-data-sink
+        methods:
+          - POST
+        paths:
+          - /v1/datasinks/onboard
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      # Data Connectors - Data Sources
+      - name: flockr-admin-list-data-sources
+        methods:
+          - GET
+        paths:
+          - /v1/datasources
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+      - name: flockr-admin-onboard-data-source
+        methods:
+          - POST
+        paths:
+          - /v1/datasources/onboard
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-admin
+          - data-connectors
+        https_redirect_status_code: 426
+
+  # Flockr Users API Service (port 8260)
+  - connect_timeout: 10000
+    host: localhost
+    name: flockr-users
+    port: 8260
+    protocol: http
+    read_timeout: 60000
+    retries: 1
+    write_timeout: 60000
+    tags:
+      - flockr-users
+    routes:
+      # Bulk Cohort Assignment
+      - name: flockr-users-bulk-assign
+        methods:
+          - POST
+        paths:
+          - /flockr/users/assignments/bulk
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-users
+          - bulk-cohort-assignment
+        https_redirect_status_code: 426
+      # User Cohorts
+      - name: flockr-users-get-cohorts
+        methods:
+          - GET
+        paths:
+          - /flockr/users/get-cohorts
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-users
+          - user-cohorts
+        https_redirect_status_code: 426
+      # Health Check
+      - name: flockr-users-healthcheck
+        methods:
+          - GET
+        paths:
+          - /healthcheck
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        strip_path: false
+        tags:
+          - flockr-users
+          - health-check
+        https_redirect_status_code: 426
+      # User Cohort Mapping
+      - name: flockr-users-map-cohorts
+        methods:
+          - POST
+        paths:
+          - /flockr/users/map-cohorts
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 100
+        strip_path: false
+        tags:
+          - flockr-users
+          - user-cohort-mapping
+        https_redirect_status_code: 426
+      - name: flockr-users-map-cohorts-batch
+        methods:
+          - POST
+        paths:
+          - /flockr/users/map-cohorts/batch
+        path_handling: v1
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 200
+        strip_path: false
+        tags:
+          - flockr-users
+          - user-cohort-mapping
+        https_redirect_status_code: 426
+
 plugins:
   # Global CORS - allows frontend to access Kong APIs
   - name: cors
@@ -85,6 +440,32 @@ plugins:
       - https
     tags:
       - testlab
+
+
+  - name: swap-header
+    service: flockr-admin
+    config:
+      source_header: x-api-key
+      target_header: x-project-key
+    enabled: true
+    protocols:
+      - http
+      - https
+    tags:
+      - flockr-admin
+
+  - name: swap-header
+    service: flockr-users
+    config:
+      source_header: x-api-key
+      target_header: x-project-key
+    enabled: true
+    protocols:
+      - http
+      - https
+    tags:
+      - flockr-users
+
   - name: circuit-breaker
     config:
       api_call_timeout_ms: 1000
