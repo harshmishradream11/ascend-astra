@@ -132,6 +132,7 @@ services:
     methods:
     - GET
     - POST
+    - OPTIONS
     name: tenant-manager-tenants
     path_handling: v1
     paths:
@@ -147,6 +148,7 @@ services:
   - https_redirect_status_code: 426
     methods:
     - GET
+    - OPTIONS
     name: tenant-manager-tenant
     path_handling: v1
     paths:
@@ -163,6 +165,7 @@ services:
     methods:
     - GET
     - POST
+    - OPTIONS
     name: tenant-manager-projects
     path_handling: v1
     paths:
@@ -178,6 +181,7 @@ services:
   - https_redirect_status_code: 426
     methods:
     - GET
+    - OPTIONS
     name: tenant-manager-project
     path_handling: v1
     paths:
@@ -193,6 +197,7 @@ services:
   - https_redirect_status_code: 426
     methods:
     - POST
+    - OPTIONS
     name: tenant-manager-api-keys
     path_handling: v1
     paths:
@@ -208,6 +213,7 @@ services:
   - https_redirect_status_code: 426
     methods:
     - GET
+    - OPTIONS
     name: tenant-manager-api-key
     path_handling: v1
     paths:
@@ -223,6 +229,7 @@ services:
   - https_redirect_status_code: 426
     methods:
     - POST
+    - OPTIONS
     name: tenant-manager-api-key-rotate
     path_handling: v1
     paths:
