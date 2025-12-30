@@ -50,6 +50,16 @@ if [ $retry -eq $max_retries ]; then
     echo "Warning: Kong may not be fully ready yet"
 fi
 
+# Sync Kong configuration using deck
+echo ""
+echo "Syncing Kong configuration..."
+if command -v deck &> /dev/null; then
+    "$SCRIPT_DIR/deck-sync.sh"
+else
+    echo "Warning: deck CLI not found. Skipping configuration sync."
+    echo "Install deck from: https://docs.konghq.com/deck/latest/installation/"
+fi
+
 # Display status
 echo ""
 echo "============================================"
@@ -63,6 +73,13 @@ echo "  - Kong Manager:   http://localhost:8002"
 echo "  - PostgreSQL:     localhost:5432"
 echo "  - Redis:          localhost:6379"
 echo ""
+echo "Tenant Manager API Endpoints:"
+echo "  - POST   /v1/tenants                              - Create tenant"
+echo "  - GET    /v1/tenants                              - List tenants"
+echo "  - GET    /v1/tenants/{tenant_id}                  - Get tenant"
+echo "  - POST   /v1/tenants/{id}/projects                - Create project"
+echo "  - GET    /v1/tenants/{id}/projects                - List projects"
+echo "  - POST   /v1/tenants/{id}/projects/{id}/api-keys  - Generate API key"
 echo ""
 echo "View logs:  docker compose logs -f kong"
 echo "Stop:       docker compose down"
