@@ -50,6 +50,16 @@ if [ $retry -eq $max_retries ]; then
     echo "Warning: Kong may not be fully ready yet"
 fi
 
+# Sync Kong configuration using deck
+echo ""
+echo "Syncing Kong configuration..."
+if command -v deck &> /dev/null; then
+    "$SCRIPT_DIR/deck-sync.sh"
+else
+    echo "Warning: deck CLI not found. Skipping configuration sync."
+    echo "Install deck from: https://docs.konghq.com/deck/latest/installation/"
+fi
+
 # Display status
 echo ""
 echo "============================================"

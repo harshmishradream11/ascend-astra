@@ -115,6 +115,26 @@ services:
     networks:
       - ascend-network
     restart: unless-stopped
+    volumes:
+      - ./ascend-astra/kong.yml:/kong-config/kong.yml:ro
+
+  # Deck Sync - Automatically sync Kong configuration
+  deck-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ascend-deck-sync
+    depends_on:
+      kong:
+        condition: service_healthy
+    entrypoint: ["/bin/bash"]
+    command: ["/scripts/deck-sync.sh", "http://kong:8001", "/kong-config/kong.yml"]
+    volumes:
+      - ./scripts/deck-sync.sh:/scripts/deck-sync.sh:ro
+      - ./ascend-astra/kong.yml:/kong-config/kong.yml:ro
+    networks:
+      - ascend-network
+    restart: "no"
 
 networks:
   ascend-network:

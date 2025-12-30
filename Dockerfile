@@ -2,8 +2,14 @@ FROM kong:3.7.1-ubuntu
 
 USER root
 
-# Install build dependencies for luarocks
+# Install build dependencies for luarocks and deck CLI
 RUN apt-get update && apt-get install -y build-essential wget curl && \
+   # Install deck CLI
+   curl -sL https://github.com/kong/deck/releases/download/v1.40.2/deck_1.40.2_linux_amd64.tar.gz -o /tmp/deck.tar.gz && \
+   tar -xf /tmp/deck.tar.gz -C /tmp && \
+   mv /tmp/deck /usr/local/bin/deck && \
+   chmod +x /usr/local/bin/deck && \
+   rm -f /tmp/deck.tar.gz && \
    # Find the actual LuaJIT headers path
    LUAJIT_PATH=$(find /usr -name "lua.h" 2>/dev/null | head -1 | xargs dirname) && \
    echo "Using LuaJIT headers at: $LUAJIT_PATH" && \

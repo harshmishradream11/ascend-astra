@@ -4,8 +4,11 @@ set -euo pipefail
 # Sync Kong configuration from kong.yaml
 # Usage: ./deck-sync.sh [KONG_ADMIN_URL] [CONFIG_FILE]
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 KONG_ADMIN_URL=${1:-"http://localhost:8001"}
-CONFIG_FILE=${2:-"ascend-astra/kong.yml"}
+CONFIG_FILE=${2:-"$PROJECT_ROOT/ascend-astra/kong.yml"}
 
 echo "Syncing Kong config to: $KONG_ADMIN_URL"
 echo "Using config file: $CONFIG_FILE"
@@ -16,6 +19,6 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 export DECK_ANALYTICS=off
-deck sync --kong-addr="$KONG_ADMIN_URL" --state "$CONFIG_FILE"
+deck gateway sync "$CONFIG_FILE" --kong-addr="$KONG_ADMIN_URL"
 
 echo "✓ Kong configuration synced successfully"
