@@ -22,6 +22,7 @@ plugins:
     - X-Requested-With
     - X-Request-ID
     - X-Api-Key
+    - email
     max_age: 3600
     methods:
     - GET
@@ -33,6 +34,7 @@ plugins:
     - HEAD
     origins:
     - http://localhost:9000
+    - http://localhost:9001
   enabled: true
   name: cors
   protocols:
