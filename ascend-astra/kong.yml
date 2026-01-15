@@ -596,7 +596,7 @@ services:
     plugins:
     - name: circuit-breaker
       config:
-        api_call_timeout_ms: 60000
+        api_call_timeout_ms: 10000
         failure_percent_threshold: 51
         min_calls_in_window: 10
         window_time: 10
